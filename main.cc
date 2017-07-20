@@ -1,5 +1,6 @@
 #include <mysql.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -16,7 +17,21 @@
 long int gLastInserted[SensorType::Last];
 unsigned int gNumInsertions;
 
+Database *gDB;
+
+void sig_handler(int signo) {
+    if (signo == SIGINT) {
+        fprintf(stderr, "received SIGINT\n");
+        if (gDB) {
+            delete gDB;
+        }
+        exit(0);
+    }
+}
+
 int main(int argc, char *argv[]) {
+    signal(SIGINT, sig_handler);
+
     memset(gLastInserted, 0x00, sizeof(gLastInserted));
 
     gNumInsertions = 0;
@@ -27,6 +42,10 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Failed to initialize database object\n");
         return 0;
     }
+
+    // Store a reference in case we need to
+    // delete it when receiving SIGINT
+    gDB = db;
 
     if (!db->Connect()) {
         fprintf(stderr, "Failed to connect: %s\n", db->GetLastError());
@@ -101,6 +120,10 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    delete db;
+    if (db) {
+        delete db;
+        db = gDB = nullptr;
+    }
+
     return 1;
 }
