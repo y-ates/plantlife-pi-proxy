@@ -112,7 +112,7 @@ bool Database::InsertValue(SensorType type, float value) {
 
     localtime_r(&t, &now);
 
-    ts.year = now.tm_year + 1900; // tm_year is year since 1900
+    ts.year = now.tm_year + 1900;  // tm_year is year since 1900
     ts.month = now.tm_mon;
     ts.day = now.tm_mday;
 
