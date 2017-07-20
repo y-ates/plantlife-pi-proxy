@@ -1,0 +1,40 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          plantlifed
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Starts plantlife daemon
+# Description:       Starts plantlife daemon
+### END INIT INFO
+
+NAME=plantlifed
+PIDFILE=/var/run/$NAME.pid
+
+DAEMON=/usr/sbin/plantlifed
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+case "$1" in
+    start)
+        echo "Starting plantlife daemon"
+        start-stop-daemon --start --quiet --exec $DAEMON
+        ;;
+
+    stop)
+        echo "Stopping plantlife daemon"
+        start-stop-daemon --stop --quiet --signal INT --oknodo --name $NAME
+        ;;
+
+    restart)
+        echo "Restarting plantlife daemon"
+        start-stop-daemon --stop --quiet --signal INT --oknodo --retry 30
+	start-stop-daemon --start --quiet --name $NAME --exec $DAEMON
+        ;;
+ *)
+ echo "(start|stop|restart)"
+ ;;
+esac
+
+exit 0
