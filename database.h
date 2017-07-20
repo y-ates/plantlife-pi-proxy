@@ -3,6 +3,14 @@
 
 #include <mysql.h>
 
+enum SensorType {
+    Moisture = 0,
+    Humidity,
+    Temperature,
+    Light,
+    Last
+};
+
 class Database {
  public:
     Database(const char *host, const char *user, const char *pass,
@@ -10,7 +18,9 @@ class Database {
     ~Database();
 
     bool Connect();
+    bool InsertValue(SensorType type, float value);
 
+    // TODO(jhector): also possibility: mysql_stmt_error()
     const char *GetLastError() { return mysql_error(con_); }
 
  private:
