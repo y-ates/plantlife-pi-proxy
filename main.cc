@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "database.h"
+#include "./database.h"
 
 int main(int argc, char *argv[]) {
     Database *db = new Database("localhost", "user", "user", "plantlife");
@@ -14,6 +14,10 @@ int main(int argc, char *argv[]) {
 
     if (!db->Connect()) {
         fprintf(stderr, "Failed to connect: %s\n", db->GetLastError());
+    }
+
+    if (!db->InsertValue(SensorType::Moisture, 3.2f)) {
+        fprintf(stderr, "Failed to insert value: %s\n", db->GetLastError());
     }
 
     delete db;
