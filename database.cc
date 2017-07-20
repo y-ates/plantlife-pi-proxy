@@ -107,12 +107,12 @@ bool Database::InsertValue(SensorType type, float value) {
     }
 
     // Set to current time
-    time_t t = time(nullptr);
-    struct tm now;;
+    time_t t = time(0);
+    struct tm now = {0};
 
     localtime_r(&t, &now);
 
-    ts.year = now.tm_year;
+    ts.year = now.tm_year + 1900; // tm_year is year since 1900
     ts.month = now.tm_mon;
     ts.day = now.tm_mday;
 
