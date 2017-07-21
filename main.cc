@@ -15,7 +15,7 @@
 
 // Every 30 minutes we care about new data
 // that gives us 48 entries per 24 hours.
-#define INTERVAL 30
+#define INTERVAL 1  // 30 
 
 long int gLastInserted[SensorType::Last];
 unsigned int gNumInsertions;
@@ -127,6 +127,7 @@ int main(int argc, char *argv[]) {
 
             unsigned int type = (encodedData/10000) % 10;
             float sensorValue = static_cast<float>(encodedData % 10000);
+            std::cout << "sensorValue: " << sensorValue << std::endl;  // debugging
 
             // Only accept sensor data within the range of sensor we support
             if (type < 0 || type >= SensorType::Last) {

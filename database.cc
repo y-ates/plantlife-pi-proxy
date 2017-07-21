@@ -66,7 +66,7 @@ bool Database::InsertValue(SensorType type, float value) {
     // Now get the integer of the returned id from the database
     int type_id = atoi(row[0]);
 
-    // Prepare our statement to inser the value
+    // Prepare our statement to insert the value
     MYSQL_TIME  ts;
     MYSQL_BIND  bind[3];
     MYSQL_STMT  *stmt;
