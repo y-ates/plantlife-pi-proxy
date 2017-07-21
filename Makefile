@@ -2,7 +2,8 @@ MYSQL_CONFIG ?= mysql_config
 MYSQL_CFLAGS := $(shell mysql_config --cflags)
 MYSQL_LDFLAGS := $(shell mysql_config --libs)
 
-CXXFLAGS := -DRPI -std=c++11 $(MYSQL_CFLAGS) $(if $(DEBUG),-O0 -g)
+#CXXFLAGS := -DRPI -std=c++11 $(MYSQL_CFLAGS) $(if $(DEBUG),-O0 -g)
+CXXFLAGS := -DRPI -std=c++0x $(MYSQL_CFLAGS) $(if $(DEBUG),-O0 -g)
 LDFLAGS := -lwiringPi $(MYSQL_LDFLAGS)
 
 build: plantlifed
