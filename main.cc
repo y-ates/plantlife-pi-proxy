@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
                 continue;
             }
 
-            if (db->InsertValue(static_cast<SensorType>(type), sensorValue)) {
+            if (!db->InsertValue(static_cast<SensorType>(type), sensorValue)) {
                 fprintf(stderr, "Insert failed: value %3.2f for type %d: %s\n",
                     sensorValue, type, db->GetLastError());
             }
