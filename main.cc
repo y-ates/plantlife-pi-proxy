@@ -83,6 +83,10 @@ int main(int argc, char *argv[]) {
     memset(gLastInserted, 0x00, sizeof(gLastInserted));
 
     gNumInsertions = 0;
+    gLastInserted[1] = static_cast<long int>(time(0));
+    gLastInserted[2] = gLastInserted[1];
+    gLastInserted[3] = gLastInserted[1];
+    gLastInserted[4] = gLastInserted[1];
 
     // Establish database connection
     Database *db = new Database("localhost", "user", "user", "plantlife");
@@ -118,8 +122,6 @@ int main(int argc, char *argv[]) {
                 continue;
             }
 
-
-
             // Received integers are encoded like this:
             // XYZZZZ
             //  X = identifies the sender arduino (not used)
@@ -134,9 +136,10 @@ int main(int argc, char *argv[]) {
             std::cout << "type: " << static_cast<int>((encodedData/1000)) << std::endl;
             float sensorValue = static_cast<float>(encodedData % 1000);
             std::cout << "sensorValue: " << sensorValue << std::endl;  // debugging
+            
             // Only accept sensor data within the range of sensor we support
             if (type < 0 || type >= SensorType::Last) {
-                std::cout << "type in if: " << type << std::endl;
+                fprintf(stderr, "Error: Sensortype out of range\n");
                 rcswitch.resetAvailable();
                 continue;
             }
@@ -144,10 +147,12 @@ int main(int argc, char *argv[]) {
             long int ts = static_cast<long int>(time(0));
 
             // Only care if our interval is expired
-            //if (ts >= gLastInserted[type] + (INTERVAL * 60)) {
-            //    rcswitch.resetAvailable();
-            //    continue;
-            //}
+            std::cout << "ts: " << ts << std::endl;
+            std::cout << "INTERVAL*60: "  << (gLastInserted[type] + (INTERVAL * 60)) << std::endl;
+            if (ts >= (gLastInserted[type] + (INTERVAL * 60))) {
+                rcswitch.resetAvailable();
+                continue;
+            }
 
             if (!db->InsertValue(static_cast<SensorType>(type), sensorValue)) {
                 fprintf(stderr, "Insert failed: value %3.2f for type %d: %s\n",
@@ -162,9 +167,9 @@ int main(int argc, char *argv[]) {
 
         // Once we received values from each sensor we
         // sleep for INTERVAL min to avoid waisting cycles.
-        if ((gNumInsertions % SensorType::Last) == 0) {
-            sleep(INTERVAL*60);
-        }
+        //if ((gNumInsertions % SensorType::Last) == 0) {
+        //    sleep(INTERVAL*60);
+        //}
     }
 
 #if 0
