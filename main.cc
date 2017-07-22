@@ -10,14 +10,12 @@
 #include <cstring>
 #include <ctime>
 
-#include <iostream>
-
 #include "./database.h"
 #include "./rcswitch.h"
 
-// Every 30 minutes we care about new data
+// Every 2 minutes we care about new data
 // that gives us 48 entries per 24 hours.
-#define INTERVAL 1  // 30
+#define INTERVAL 2
 
 long int gLastInserted[SensorType::Last];
 unsigned int gNumInsertions;
@@ -76,17 +74,13 @@ void sig_handler(int signo) {
 }
 
 int main(int argc, char *argv[]) {
-    //    daemonize();
+    daemonize();
 
     signal(SIGINT, sig_handler);
 
     memset(gLastInserted, 0x00, sizeof(gLastInserted));
 
     gNumInsertions = 0;
-    gLastInserted[1] = static_cast<long int>(time(0));
-    gLastInserted[2] = gLastInserted[1];
-    gLastInserted[3] = gLastInserted[1];
-    gLastInserted[4] = gLastInserted[1];
 
     // Establish database connection
     Database *db = new Database("localhost", "user", "user", "plantlife");
@@ -132,10 +126,7 @@ int main(int argc, char *argv[]) {
             // something needs to change here.
 
             int type = static_cast<int>((encodedData/1000)) % 10;
-            std::cout << "encoded data: " << encodedData << std::endl;
-            std::cout << "type: " << static_cast<int>((encodedData/1000)) << std::endl;
             float sensorValue = static_cast<float>(encodedData % 1000);
-            std::cout << "sensorValue: " << sensorValue << std::endl;  // debugging
             
             // Only accept sensor data within the range of sensor we support
             if (type < 0 || type >= SensorType::Last) {
@@ -147,9 +138,7 @@ int main(int argc, char *argv[]) {
             long int ts = static_cast<long int>(time(0));
 
             // Only care if our interval is expired
-            std::cout << "ts: " << ts << std::endl;
-            std::cout << "INTERVAL*60: "  << (gLastInserted[type] + (INTERVAL * 60)) << std::endl;
-            if (ts >= (gLastInserted[type] + (INTERVAL * 60))) {
+            if (ts <= (gLastInserted[type] + (INTERVAL * 60))) {
                 rcswitch.resetAvailable();
                 continue;
             }
@@ -167,9 +156,9 @@ int main(int argc, char *argv[]) {
 
         // Once we received values from each sensor we
         // sleep for INTERVAL min to avoid waisting cycles.
-        //if ((gNumInsertions % SensorType::Last) == 0) {
-        //    sleep(INTERVAL*60);
-        //}
+        if ((gNumInsertions % SensorType::Last) == 0) {
+            sleep(INTERVAL*60);
+        }
     }
 
 #if 0
