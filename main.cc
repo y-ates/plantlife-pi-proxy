@@ -10,12 +10,14 @@
 #include <cstring>
 #include <ctime>
 
+#include <iostream>  // TODO DELETE
+
 #include "./database.h"
 #include "./rcswitch.h"
 
 // Every 30 minutes we care about new data
 // that gives us 48 entries per 24 hours.
-#define INTERVAL 1  // 30 
+#define INTERVAL 1  // 30 TODO
 
 long int gLastInserted[SensorType::Last];
 unsigned int gNumInsertions;
@@ -27,7 +29,7 @@ static void daemonize(void) {
 
     /* already a daemon */
     if (getppid() == 1) {
-       return;
+        return;
     }
 
     /* Fork off the parent process */
@@ -74,7 +76,7 @@ void sig_handler(int signo) {
 }
 
 int main(int argc, char *argv[]) {
-    //daemonize();  // fg process for error codes
+    // daemonize();
 
     signal(SIGINT, sig_handler);
 
@@ -125,28 +127,30 @@ int main(int argc, char *argv[]) {
             // TODO(jhector): when supporting more arduino,
             // something needs to change here.
 
-            unsigned int type = (encodedData/10000) % 10;
-            float sensorValue = static_cast<float>(encodedData % 10000);
-
-            /* TODO: Something goes wrong here */
-            // // Only accept sensor data within the range of sensor we support
-            // if (type < 0 || type >= SensorType::Last) {
-            //     rcswitch.resetAvailable();
-            //     continue;
-            // }
+            int type = static_cast<int>((encodedData/1000)) % 10;
+            std::cout << "encoded data: " << encodedData << std::endl;
+            std::cout << "type: " << static_cast<int>((encodedData/1000)) << std::endl;
+            float sensorValue = static_cast<float>(encodedData % 1000);
+            std::cout << "sensorValue: " << sensorValue << std::endl;  // debugging
+            
+            // Only accept sensor data within the range of sensor we support
+            if (type < 0 || type >= SensorType::Last) {
+                std::cout << "type in if: " << type << std::endl;
+                rcswitch.resetAvailable();
+                continue;
+            }
 
             long int ts = static_cast<long int>(time(0));
 
-            /* TODO: Something goes wrong here */
-            // // Only care if our interval is expired
+            // Only care if our interval is expired
             // if (ts >= gLastInserted[type] + (INTERVAL * 60)) {
-            //     rcswitch.resetAvailable();
-            //     continue;
+            //    rcswitch.resetAvailable();
+            //    continue;
             // }
 
             if (!db->InsertValue(static_cast<SensorType>(type), sensorValue)) {
                 fprintf(stderr, "Insert failed: value %3.2f for type %d: %s\n",
-                    sensorValue, type, db->GetLastError());
+                        sensorValue, type, db->GetLastError());
             }
 
             gNumInsertions++;
