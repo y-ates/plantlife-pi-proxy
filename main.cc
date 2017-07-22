@@ -10,6 +10,8 @@
 #include <cstring>
 #include <ctime>
 
+#include <iostream>  // delete later
+
 #include "./database.h"
 #include "./rcswitch.h"
 
@@ -74,7 +76,7 @@ void sig_handler(int signo) {
 }
 
 int main(int argc, char *argv[]) {
-    daemonize();
+    //daemonize();  // fg process for error codes
 
     signal(SIGINT, sig_handler);
 
