@@ -129,21 +129,22 @@ int main(int argc, char *argv[]) {
 
             unsigned int type = (encodedData/10000) % 10;
             float sensorValue = static_cast<float>(encodedData % 10000);
-            std::cout << "sensorValue: " << sensorValue << std::endl;  // debugging
 
-            // Only accept sensor data within the range of sensor we support
-            if (type < 0 || type >= SensorType::Last) {
-                rcswitch.resetAvailable();
-                continue;
-            }
+            /* TODO: Something goes wrong here */
+            // // Only accept sensor data within the range of sensor we support
+            // if (type < 0 || type >= SensorType::Last) {
+            //     rcswitch.resetAvailable();
+            //     continue;
+            // }
 
             long int ts = static_cast<long int>(time(0));
 
-            // Only care if our interval is expired
-            if (ts >= gLastInserted[type] + (INTERVAL * 60)) {
-                rcswitch.resetAvailable();
-                continue;
-            }
+            /* TODO: Something goes wrong here */
+            // // Only care if our interval is expired
+            // if (ts >= gLastInserted[type] + (INTERVAL * 60)) {
+            //     rcswitch.resetAvailable();
+            //     continue;
+            // }
 
             if (!db->InsertValue(static_cast<SensorType>(type), sensorValue)) {
                 fprintf(stderr, "Insert failed: value %3.2f for type %d: %s\n",
