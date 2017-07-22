@@ -10,8 +10,6 @@
 #include <cstring>
 #include <ctime>
 
-#include <iostream>  // delete later
-
 #include "./database.h"
 #include "./rcswitch.h"
 
