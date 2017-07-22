@@ -10,14 +10,14 @@
 #include <cstring>
 #include <ctime>
 
-#include <iostream>  // TODO DELETE
+#include <iostream>
 
 #include "./database.h"
 #include "./rcswitch.h"
 
 // Every 30 minutes we care about new data
 // that gives us 48 entries per 24 hours.
-#define INTERVAL 1  // 30 TODO
+#define INTERVAL 1  // 30
 
 long int gLastInserted[SensorType::Last];
 unsigned int gNumInsertions;
@@ -76,7 +76,7 @@ void sig_handler(int signo) {
 }
 
 int main(int argc, char *argv[]) {
-    // daemonize();
+    //    daemonize();
 
     signal(SIGINT, sig_handler);
 
@@ -111,12 +111,14 @@ int main(int argc, char *argv[]) {
     // Enter our endless loop for receiving data
     while (1) {
         if (rcswitch.available()) {
-            if (rcswitch.getReceivedValue() == 0) {
+            int encodedData = rcswitch.getReceivedValue();
+            
+            if (encodedData == 0) {
                 rcswitch.resetAvailable();
                 continue;
             }
 
-            int encodedData = rcswitch.getReceivedValue();
+
 
             // Received integers are encoded like this:
             // XYZZZZ
@@ -132,7 +134,6 @@ int main(int argc, char *argv[]) {
             std::cout << "type: " << static_cast<int>((encodedData/1000)) << std::endl;
             float sensorValue = static_cast<float>(encodedData % 1000);
             std::cout << "sensorValue: " << sensorValue << std::endl;  // debugging
-            
             // Only accept sensor data within the range of sensor we support
             if (type < 0 || type >= SensorType::Last) {
                 std::cout << "type in if: " << type << std::endl;
@@ -143,10 +144,10 @@ int main(int argc, char *argv[]) {
             long int ts = static_cast<long int>(time(0));
 
             // Only care if our interval is expired
-            // if (ts >= gLastInserted[type] + (INTERVAL * 60)) {
+            //if (ts >= gLastInserted[type] + (INTERVAL * 60)) {
             //    rcswitch.resetAvailable();
             //    continue;
-            // }
+            //}
 
             if (!db->InsertValue(static_cast<SensorType>(type), sensorValue)) {
                 fprintf(stderr, "Insert failed: value %3.2f for type %d: %s\n",
