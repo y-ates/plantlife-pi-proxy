@@ -13,9 +13,9 @@
 #include "./database.h"
 #include "./rcswitch.h"
 
-// Every 2 minutes we care about new data
+// Every 30 minutes we care about new data
 // that gives us 48 entries per 24 hours.
-#define INTERVAL 2
+#define INTERVAL 30
 
 long int gLastInserted[SensorType::Last];
 unsigned int gNumInsertions;
