@@ -153,12 +153,6 @@ int main(int argc, char *argv[]) {
 
             rcswitch.resetAvailable();
         }
-
-        // Once we received values from each sensor we
-        // sleep for INTERVAL min to avoid waisting cycles.
-        //if ((gNumInsertions % SensorType::Last) == 0) {
-        //    sleep(INTERVAL*60);
-        //}
     }
 
 #if 0
